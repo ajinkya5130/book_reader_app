@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "664104638823",
+    "project_id": "bookreader-5f2cd",
+    "storage_bucket": "bookreader-5f2cd.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:664104638823:android:8b905be6b0b16c99b1b7c2",
+        "android_client_info": {
+          "package_name": "com.ajinkya.bookreaderapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "664104638823-p05unlpsn4ofkpkmgoqj19hi5a9msmll.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ajinkya.bookreaderapp",
+            "certificate_hash": "b44c8e6aabf416535a1ae4c524201442559420dd"
+          }
+        },
+        {
+          "client_id": "664104638823-91lmcvvb1dmum7k5o8k34hp5mjtcs06s.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCf1whtk3WU8vbsKK0PgJbeg0j0o5lRddg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "664104638823-91lmcvvb1dmum7k5o8k34hp5mjtcs06s.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
