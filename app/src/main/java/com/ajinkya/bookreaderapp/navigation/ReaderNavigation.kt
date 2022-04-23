@@ -6,6 +6,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.ajinkya.bookreaderapp.screens.details.BookDetailsScreen
 import com.ajinkya.bookreaderapp.screens.home.HomeScreen
+import com.ajinkya.bookreaderapp.screens.login.LoginScreen
 import com.ajinkya.bookreaderapp.screens.search.ReaderBookSearchScreen
 import com.ajinkya.bookreaderapp.screens.splashScreen.ReaderSplashScreen
 import com.ajinkya.bookreaderapp.screens.stats.ReaderBookStatScreen
@@ -19,6 +20,9 @@ fun ReaderNavigation() {
 
         composable(route = ReaderScreensEnum.SplashScreen.name) {
             ReaderSplashScreen(navController)
+        }
+        composable(route = ReaderScreensEnum.LoginScreen.name) {
+            LoginScreen(navController)
         }
         composable(route = ReaderScreensEnum.ReaderHomeScreen.name) {
             HomeScreen(navController)
