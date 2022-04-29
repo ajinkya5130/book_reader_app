@@ -9,4 +9,7 @@ object Constants {
     //Firestore fields
     const val FIRESTORE_USER_ID = "user_id"
     const val FIRESTORE_DISPLAY_NAME = "display_name"
+    const val FIRESTORE_PROFILE_URL = "profileUrl"
+    const val FIRESTORE_QUOTE = "quote"
+    const val FIRESTORE_PROFESSION = "profession"
 }

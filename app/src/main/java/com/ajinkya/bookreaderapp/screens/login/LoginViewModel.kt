@@ -5,7 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ajinkya.bookreaderapp.utils.Constants
+import com.ajinkya.bookreaderapp.model.UserModel
 import com.ajinkya.bookreaderapp.utils.ToastEnum
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
@@ -49,12 +49,11 @@ class LoginViewModel : ViewModel() {
     }
 
     private fun createUser(displayName: String?) {
-        val currentTime = System.currentTimeMillis()
         val userId = auth.currentUser?.uid
-        val userInfo = mutableMapOf<String, Any>()
-        userInfo[Constants.FIRESTORE_USER_ID] = userId ?: "DummyUserId_$currentTime"
-        userInfo[Constants.FIRESTORE_DISPLAY_NAME] = displayName ?: "DummyUser_$currentTime"
-
+        val userInfo = UserModel(
+            userId = userId.toString(), displayName = displayName.toString(), profileUrl = "",
+            profession = "Developer", quote = "There is will, there is a way!", id = null
+        ).toMap()
         FirebaseFirestore.getInstance().collection("users").add(userInfo)
 
 
