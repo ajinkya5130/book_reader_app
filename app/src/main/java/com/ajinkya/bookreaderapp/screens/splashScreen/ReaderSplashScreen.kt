@@ -18,6 +18,7 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.ajinkya.bookreaderapp.components.ReaderLogo
 import com.ajinkya.bookreaderapp.navigation.ReaderScreensEnum
 import kotlinx.coroutines.delay
 
@@ -57,11 +58,7 @@ fun ReaderSplashScreen(navController: NavHostController) {
             verticalArrangement = Arrangement.Center
         ) {
 
-            Text(
-                text = "Book Reader",
-                style = MaterialTheme.typography.h4,
-                color = Color.Red.copy(.4f)
-            )
+            ReaderLogo()
 
             Spacer(modifier = Modifier.height(10.dp))
 
