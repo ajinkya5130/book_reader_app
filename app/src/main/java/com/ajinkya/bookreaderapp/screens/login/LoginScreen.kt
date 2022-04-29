@@ -22,18 +22,21 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.ajinkya.bookreaderapp.components.EmailInput
 import com.ajinkya.bookreaderapp.components.PasswordInput
 import com.ajinkya.bookreaderapp.components.ReaderLogo
+import com.ajinkya.bookreaderapp.navigation.ReaderScreensEnum
 import com.ajinkya.bookreaderapp.utils.Constants
 
 
 private const val TAG = "LoginScreen"
 
 @Composable
-fun LoginScreen(navController: NavHostController) {
+fun LoginScreen(navController: NavHostController, viewModel: LoginViewModel = viewModel()) {
     val showLoginForm = rememberSaveable { mutableStateOf(true) }
+
     Surface(modifier = Modifier.fillMaxSize()) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -44,11 +47,16 @@ fun LoginScreen(navController: NavHostController) {
                 UserForm(isCreateAccount = false, loading = false) { email, pass ->
                     Log.e(TAG, "LoginScreen: $email and $pass")
                     //Todo: open Firebase account
+                    viewModel.signInWithEmailAndPass(email, pass) {
+                        navController.navigate(ReaderScreensEnum.ReaderHomeScreen.name)
+                    }
                 }
             } else {
                 UserForm(isCreateAccount = true, loading = false) { email, pass ->
                     //Todo: create Firebase account
-
+                    viewModel.createUserWithEmail(email, pass) {
+                        navController.navigate(ReaderScreensEnum.ReaderHomeScreen.name)
+                    }
                 }
             }
         }
@@ -94,24 +102,23 @@ fun UserForm(
         email.value.trim().isNotEmpty() && password.value.trim().isNotEmpty()
     }
     val modifier = Modifier
-        .height(250.dp)
+        .height(350.dp)
         .background(MaterialTheme.colors.background)
         .verticalScroll(rememberScrollState())
     Column(modifier, horizontalAlignment = Alignment.CenterHorizontally) {
 
-        if (isCreateAccount) {
+        /*if (isCreateAccount) {
             Text(
                 text = "Please enter a valid email and password that is at least 6 characters",
                 modifier.padding(4.dp)
             )
         } else {
             Text(text = "asas")
-        }
+        }*/
 
         EmailInput(emailState = email, enabled = !loading, onAction = KeyboardActions {
             passwordFocusRequest.requestFocus()
         })
-
         PasswordInput(modifier = Modifier.focusRequester(passwordFocusRequest),
             passwordState = password,
             labelId = "Password",
@@ -124,6 +131,7 @@ fun UserForm(
 
             })
 
+
         SubmitButton(
             if (isCreateAccount) Constants.CREATE_ACCOUNT else Constants.LOG_IN,
             loading,
@@ -131,6 +139,12 @@ fun UserForm(
         ) {
             onDone(email.value.trim(), password.value.trim())
             keyboardController?.hide()
+        }
+        if (isCreateAccount) {
+            Text(
+                text = "Please enter a valid email and password that is at least 6 characters",
+                modifier.padding(10.dp)
+            )
         }
 
 
