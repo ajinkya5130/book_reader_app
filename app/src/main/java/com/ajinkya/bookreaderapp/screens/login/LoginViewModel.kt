@@ -25,19 +25,19 @@ class LoginViewModel : ViewModel() {
     private val _loading = MutableLiveData(false)
     val loadingLiveData: LiveData<Boolean> = _loading
 
-    fun createUserWithEmail(email: String, pass: String, home: () -> Unit) {
+    fun createUserWithEmail(email: String, pass: String, home: (Boolean) -> Unit) {
         if (_loading.value == false) {
             _loading.value = true
             auth.createUserWithEmailAndPassword(email, pass).addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     val displayName = task.result.user?.let { email.split("@")[0] }
-                    createUser(displayName)
-                    home()
+                    createUser(displayName, email)
+                    _toastMessage.value = Pair("User created successfully!", ToastEnum.LongDuration)
+                    home(true)
                 } else {
                     task.exception?.let {
-                        //_toastMessage.value = Pair(it.message!!,ToastEnum.LongDuration)
-
-
+                        _toastMessage.value = Pair(it.message!!, ToastEnum.LongDuration)
+                        home(false)
                     }
                     Log.e(TAG, "createUserWithEmail: ${task.exception!!.message} ")
                 }
@@ -48,18 +48,23 @@ class LoginViewModel : ViewModel() {
 
     }
 
-    private fun createUser(displayName: String?) {
+    private fun createUser(displayName: String?, email: String) {
         val userId = auth.currentUser?.uid
         val userInfo = UserModel(
-            userId = userId.toString(), displayName = displayName.toString(), profileUrl = "",
-            profession = "Developer", quote = "There is will, there is a way!", id = null
+            userId = userId.toString(),
+            mailId = email,
+            displayName = displayName.toString(),
+            profileUrl = "",
+            profession = "Developer",
+            quote = "Where there is a will There is a way!",
+            id = null
         ).toMap()
         FirebaseFirestore.getInstance().collection("users").add(userInfo)
 
 
     }
 
-    fun signInWithEmailAndPass(email: String, pass: String, home: () -> Unit) =
+    fun signInWithEmailAndPass(email: String, pass: String, home: (Boolean) -> Unit) =
         viewModelScope.launch {
 
             try {
@@ -70,13 +75,20 @@ class LoginViewModel : ViewModel() {
                                 TAG,
                                 "task Successful signInWithEmailAndPass: ${task.result.user.toString()}"
                             )
-                            home()
+                            _toastMessage.value =
+                                Pair("Log-In Successfully!", ToastEnum.LongDuration)
+                            home(true)
                             // TODO("take to home screen")
                         } else {
+                            _toastMessage.value =
+                                Pair("Something is missing!", ToastEnum.LongDuration)
+                            home(false)
                             Log.e(TAG, "task failed signInWithEmailAndPass: ${task.result}")
                         }
                     } catch (e: Exception) {
+                        home(false)
                         Log.e(TAG, "task exception signInWithEmailAndPass: ${e.message}")
+                        _toastMessage.value = Pair(e.message!!, ToastEnum.LongDuration)
                     }
 
                 }

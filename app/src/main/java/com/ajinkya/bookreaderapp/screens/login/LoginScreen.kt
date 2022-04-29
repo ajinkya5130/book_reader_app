@@ -1,5 +1,6 @@
 package com.ajinkya.bookreaderapp.screens.login
 
+import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -10,6 +11,8 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -18,6 +21,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -29,14 +33,17 @@ import com.ajinkya.bookreaderapp.components.PasswordInput
 import com.ajinkya.bookreaderapp.components.ReaderLogo
 import com.ajinkya.bookreaderapp.navigation.ReaderScreensEnum
 import com.ajinkya.bookreaderapp.utils.Constants
+import com.ajinkya.bookreaderapp.utils.ToastEnum
+import com.ajinkya.bookreaderapp.utils.toastMessage
 
 
 private const val TAG = "LoginScreen"
 
 @Composable
 fun LoginScreen(navController: NavHostController, viewModel: LoginViewModel = viewModel()) {
+    val context = LocalContext.current
     val showLoginForm = rememberSaveable { mutableStateOf(true) }
-
+    val messagePair by viewModel.toastMessage.observeAsState()
     Surface(modifier = Modifier.fillMaxSize()) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -48,14 +55,20 @@ fun LoginScreen(navController: NavHostController, viewModel: LoginViewModel = vi
                     Log.e(TAG, "LoginScreen: $email and $pass")
                     //Todo: open Firebase account
                     viewModel.signInWithEmailAndPass(email, pass) {
-                        navController.navigate(ReaderScreensEnum.ReaderHomeScreen.name)
+                        if (it) {
+                            navController.navigate(ReaderScreensEnum.ReaderHomeScreen.name)
+                        }
+                        showToastMessage(messagePair, context)
                     }
                 }
             } else {
                 UserForm(isCreateAccount = true, loading = false) { email, pass ->
                     //Todo: create Firebase account
                     viewModel.createUserWithEmail(email, pass) {
-                        navController.navigate(ReaderScreensEnum.ReaderHomeScreen.name)
+                        if (it) {
+                            navController.navigate(ReaderScreensEnum.ReaderHomeScreen.name)
+                        }
+                        showToastMessage(messagePair, context)
                     }
                 }
             }
@@ -82,6 +95,11 @@ fun LoginScreen(navController: NavHostController, viewModel: LoginViewModel = vi
 
     }
 
+}
+
+fun showToastMessage(messagePair: Pair<String, ToastEnum>?, context: Context) {
+
+    toastMessage(message = messagePair!!.first, context = context, duration = messagePair!!.second)
 }
 
 @OptIn(ExperimentalComposeUiApi::class)

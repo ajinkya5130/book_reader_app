@@ -6,6 +6,7 @@ data class UserModel(
     val id: String?,
     val userId: String,
     val displayName: String,
+    val mailId: String,
     val profileUrl: String,
     val quote: String,
     val profession: String,
@@ -14,6 +15,7 @@ data class UserModel(
         return mutableMapOf(
             Constants.FIRESTORE_USER_ID to userId,
             Constants.FIRESTORE_DISPLAY_NAME to displayName,
+            Constants.FIRESTORE_MAILID to mailId,
             Constants.FIRESTORE_QUOTE to quote,
             Constants.FIRESTORE_PROFESSION to profession,
             Constants.FIRESTORE_PROFILE_URL to profileUrl
