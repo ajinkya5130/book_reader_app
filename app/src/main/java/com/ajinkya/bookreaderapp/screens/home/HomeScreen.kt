@@ -1,21 +1,20 @@
 package com.ajinkya.bookreaderapp.screens.home
 
+import android.util.Log
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -23,12 +22,15 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.ajinkya.bookreaderapp.R
+import com.ajinkya.bookreaderapp.components.FABContent
+import com.ajinkya.bookreaderapp.components.ListBooks
 import com.ajinkya.bookreaderapp.components.ReaderAppBar
+import com.ajinkya.bookreaderapp.components.TitleSection
 import com.ajinkya.bookreaderapp.model.BookModel
 import com.ajinkya.bookreaderapp.navigation.ReaderScreensEnum
 import com.google.firebase.auth.FirebaseAuth
 
-@Preview
+private const val TAG = "HomeScreen"
 @Composable
 fun HomeScreen(navController: NavHostController = rememberNavController()) {
 
@@ -56,9 +58,15 @@ fun HomeScreen(navController: NavHostController = rememberNavController()) {
 
 }
 
+@Preview
 @Composable
-fun HomeContent(navController: NavHostController) {
+fun HomeContent(navController: NavHostController = rememberNavController()) {
 
+    val listOfBooks = listOf<BookModel>(
+        BookModel("1", "Book1", "Author1", "Notes1"),
+        BookModel("2", "Book2", "Author2", "Notes2"),
+        BookModel("3", "Book3", "Author3", "Notes3"),
+    )
     val email = FirebaseAuth.getInstance().currentUser?.email
     val currentUser = if (!email.isNullOrEmpty()) {
         email.split("@")[0]
@@ -104,46 +112,58 @@ fun HomeContent(navController: NavHostController) {
             }
 
         }
+        CurrentReadingBooksSection(listOf(), navController = navController)
+        Spacer(modifier = Modifier.size(10.dp))
+        Divider()
+        TitleSection(label = "Reading Book List")
+        BookListArea(listOfBooks = listOfBooks, navController = navController)
+    }
+}
+
+@Composable
+fun BookListArea(listOfBooks: List<BookModel>, navController: NavHostController) {
+
+    HorizontalScrollableCompo(listOfBooks) {
+        Log.e(TAG, "BookListArea: $it")
 
     }
 }
 
 @Composable
-fun TitleSection(modifier: Modifier = Modifier, label: String) {
-    Surface(modifier = modifier.padding(5.dp)) {
-        Column {
-            Text(
-                modifier = modifier,
-                text = label,
-                fontSize = 20.sp,
-                fontStyle = FontStyle.Italic,
-                textAlign = TextAlign.Left
-            )
+fun HorizontalScrollableCompo(listOfBooks: List<BookModel>, onCarPressed: (BookModel) -> Unit) {
+    val scrollable = rememberScrollState()
+
+    /*LazyRow(modifier = Modifier
+        .fillMaxWidth()
+        .heightIn(200.dp)){
+        items(listOfBooks){ item ->
+            ListBooks(item){
+                onCarPressed(it)
+
+            }
+        }
+    }*/
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(200.dp)
+            .horizontalScroll(scrollable)
+    ) {
+        for (book in listOfBooks) {
+            ListBooks(book) {
+                onCarPressed(it)
+
+            }
         }
 
     }
+
 }
 
 @Composable
 fun CurrentReadingBooksSection(books: List<BookModel>, navController: NavHostController) {
 
-}
-
-
-@Composable
-fun FABContent(onTap: (String) -> Unit = {}) {
-
-    FloatingActionButton(
-        onClick = { onTap("") }, shape = RoundedCornerShape(50.dp),
-        backgroundColor = MaterialTheme.colors.secondary
-    ) {
-        Icon(
-            imageVector = Icons.Default.AddCircle,
-            contentDescription = "Fab button",
-            tint = Color.White,
-            modifier = Modifier.size(30.dp)
-        )
-
-    }
+    ListBooks()
 
 }

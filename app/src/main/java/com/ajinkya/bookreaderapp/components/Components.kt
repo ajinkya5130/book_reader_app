@@ -1,14 +1,19 @@
 package com.ajinkya.bookreaderapp.components
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Animation
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Logout
+import androidx.compose.material.icons.rounded.FavoriteBorder
+import androidx.compose.material.icons.rounded.StarBorder
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
@@ -16,17 +21,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import coil.compose.rememberImagePainter
+import com.ajinkya.bookreaderapp.model.BookModel
 import com.ajinkya.bookreaderapp.navigation.ReaderScreensEnum
 import com.google.firebase.auth.FirebaseAuth
 
@@ -191,5 +202,173 @@ fun ReaderAppBar(
             }
         }
     )
+}
+
+
+@Composable
+fun TitleSection(modifier: Modifier = Modifier, label: String) {
+    Surface(modifier = modifier.padding(5.dp)) {
+        Column {
+            Text(
+                modifier = modifier,
+                text = label,
+                fontSize = 20.sp,
+                fontStyle = FontStyle.Italic,
+                textAlign = TextAlign.Left
+            )
+        }
+
+    }
+}
+
+@Composable
+fun FABContent(onTap: (String) -> Unit = {}) {
+
+    FloatingActionButton(
+        onClick = { onTap("") }, shape = RoundedCornerShape(50.dp),
+        backgroundColor = MaterialTheme.colors.secondary
+    ) {
+        Icon(
+            imageVector = Icons.Default.AddCircle,
+            contentDescription = "Fab button",
+            tint = Color.White,
+            modifier = Modifier.size(30.dp)
+        )
+
+    }
+
+}
+
+
+@Composable
+fun BookRating(score: Double = 4.5) {
+    Surface(
+        modifier = Modifier
+            .padding(5.dp)
+            .height(80.dp),
+        shape = RoundedCornerShape(60.dp),
+        elevation = 50.dp,
+        color = Color.White
+    ) {
+        Column(modifier = Modifier.padding(4.dp)) {
+            Icon(
+                imageVector = Icons.Rounded.StarBorder, contentDescription = "Rating",
+                modifier = Modifier.padding(3.dp)
+            )
+            Text(text = score.toString(), style = MaterialTheme.typography.subtitle1)
+
+        }
+
+    }
+
+}
+
+
+@Composable
+fun RoundedButtonShape(
+    label: String = "Reading",
+    radius: Int = 30,
+    onPress: () -> Unit = {}
+) {
+    Surface(
+        shape = RoundedCornerShape(
+            bottomEndPercent = radius,
+            topStartPercent = radius
+        ), color = MaterialTheme.colors.secondaryVariant
+    ) {
+        Column(modifier = Modifier
+            .width(90.dp)
+            .heightIn(70.dp)
+            .clickable {
+                onPress.invoke()
+            },
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            //Text(text = label, fontSize = 15.dp, color = Color.Blue)
+            Text(text = label, fontSize = 15.sp, color = Color.White)
+
+        }
+
+    }
+}
+
+
+@Composable
+fun ListBooks(
+    book: BookModel = BookModel("1", "Ajinkya", "sample author", "Sample note"),
+    onPressDetails: (BookModel) -> Unit = {}
+) {
+    val context = LocalContext.current
+    val resources = context.resources
+    val displayMetrics = resources.displayMetrics
+    val screenWidth = displayMetrics.widthPixels / displayMetrics.density
+    val spacing = 10.dp
+
+    Card(
+        modifier = Modifier
+            .padding(5.dp)
+            .height(230.dp)
+            .width(280.dp)
+            .fillMaxWidth()
+            .clickable {
+                onPressDetails.invoke(book)
+            }/*.clip(RoundedCornerShape(25.dp))*/, shape = RoundedCornerShape(25.dp),
+        elevation = 6.dp,
+        backgroundColor = Color.White
+    ) {
+        Column(
+            modifier = Modifier.width(screenWidth.dp - (spacing * 2)),
+            horizontalAlignment = Alignment.Start
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Image(
+                    painter = rememberImagePainter(data = ""), contentDescription = "Book Cover",
+                    modifier = Modifier
+                        .width(150.dp)
+                        .height(140.dp)
+                )
+
+                Column(
+                    modifier = Modifier.padding(5.dp),
+                    verticalArrangement = Arrangement.Top,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.FavoriteBorder,
+                        contentDescription = "Favorite",
+                        modifier = Modifier.padding(bottom = 2.dp)
+                    )
+
+                    BookRating(score = 3.5)
+
+
+                }
+            }
+
+            Text(
+                text = book.name!!, modifier = Modifier.padding(4.dp),
+                fontWeight = FontWeight.Bold,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
+            )
+            Text(
+                text = book.authors!!, modifier = Modifier.padding(4.dp),
+                style = MaterialTheme.typography.subtitle2
+            )
+            Row(
+                verticalAlignment = Alignment.Bottom,
+                horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()
+            ) {
+                RoundedButtonShape("Reading", 70)
+            }
+
+        }
+
+
+    }
 
 }
