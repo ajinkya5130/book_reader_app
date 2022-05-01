@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
@@ -154,9 +155,11 @@ fun PasswordVisibility(passwordVisibility: MutableState<Boolean>) {
 @Preview
 @Composable
 fun ReaderAppBar(
+    iconDrawable: ImageVector? = null,
     title: String = "AppBar",
     showProfile: Boolean = true,
-    navController: NavHostController = rememberNavController()
+    navController: NavHostController = rememberNavController(),
+    onBackPressed: () -> Unit = {}
 ) {
     TopAppBar(modifier = Modifier
         .padding(5.dp)
@@ -176,6 +179,15 @@ fun ReaderAppBar(
                             .scale(1f)
                     )
                 }
+                if (iconDrawable != null) {
+                    IconButton(onClick = { onBackPressed.invoke() }) {
+                        Icon(
+                            imageVector = iconDrawable,
+                            contentDescription = "back Button",
+                            tint = Color.DarkGray.copy(.4f)
+                        )
+                    }
+                }
                 Spacer(modifier = Modifier.size(20.dp))
                 Text(
                     text = title,
@@ -183,6 +195,7 @@ fun ReaderAppBar(
                     style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 20.sp)
                 )
                 Spacer(modifier = Modifier.width(130.dp))
+
 
 
             }
@@ -194,11 +207,14 @@ fun ReaderAppBar(
                     navController.navigate(ReaderScreensEnum.LoginScreen.name)
                 }
             }) {
-                Icon(
-                    imageVector = Icons.Filled.Logout,
-                    contentDescription = "Logout",
-                    tint = Color.Red
-                )
+                if (showProfile) {
+
+                    Icon(
+                        imageVector = Icons.Filled.Logout,
+                        contentDescription = "Logout",
+                        tint = Color.Red
+                    )
+                }
             }
         }
     )

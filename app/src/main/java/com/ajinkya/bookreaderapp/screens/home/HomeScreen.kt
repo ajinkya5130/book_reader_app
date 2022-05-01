@@ -42,7 +42,7 @@ fun HomeScreen(navController: NavHostController = rememberNavController()) {
         )
     }, floatingActionButton = {
         FABContent {
-
+            navController.navigate(ReaderScreensEnum.SearchScreen.name)
         }
     }) {
 
@@ -62,11 +62,7 @@ fun HomeScreen(navController: NavHostController = rememberNavController()) {
 @Composable
 fun HomeContent(navController: NavHostController = rememberNavController()) {
 
-    val listOfBooks = listOf<BookModel>(
-        BookModel("1", "Book1", "Author1", "Notes1"),
-        BookModel("2", "Book2", "Author2", "Notes2"),
-        BookModel("3", "Book3", "Author3", "Notes3"),
-    )
+    val listOfBooks = BookModel().sampleList()
     val email = FirebaseAuth.getInstance().currentUser?.email
     val currentUser = if (!email.isNullOrEmpty()) {
         email.split("@")[0]
@@ -125,12 +121,13 @@ fun BookListArea(listOfBooks: List<BookModel>, navController: NavHostController)
 
     HorizontalScrollableCompo(listOfBooks) {
         Log.e(TAG, "BookListArea: $it")
+        //
 
     }
 }
 
 @Composable
-fun HorizontalScrollableCompo(listOfBooks: List<BookModel>, onCarPressed: (BookModel) -> Unit) {
+fun HorizontalScrollableCompo(listOfBooks: List<BookModel>, onCardPressed: (BookModel) -> Unit) {
     val scrollable = rememberScrollState()
 
     /*LazyRow(modifier = Modifier
@@ -152,7 +149,7 @@ fun HorizontalScrollableCompo(listOfBooks: List<BookModel>, onCarPressed: (BookM
     ) {
         for (book in listOfBooks) {
             ListBooks(book) {
-                onCarPressed(it)
+                onCardPressed(it)
 
             }
         }
