@@ -2,6 +2,7 @@ package com.ajinkya.bookreaderapp.navigation
 
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.Composable
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -9,6 +10,7 @@ import com.ajinkya.bookreaderapp.screens.details.BookDetailsScreen
 import com.ajinkya.bookreaderapp.screens.home.HomeScreen
 import com.ajinkya.bookreaderapp.screens.login.LoginScreen
 import com.ajinkya.bookreaderapp.screens.search.ReaderBookSearchScreen
+import com.ajinkya.bookreaderapp.screens.search.SearchViewModel
 import com.ajinkya.bookreaderapp.screens.splashScreen.ReaderSplashScreen
 import com.ajinkya.bookreaderapp.screens.stats.ReaderBookStatScreen
 import com.ajinkya.bookreaderapp.screens.updates.ReaderUpdateScreen
@@ -33,7 +35,8 @@ fun ReaderNavigation() {
             BookDetailsScreen(navController)
         }
         composable(route = ReaderScreensEnum.SearchScreen.name) {
-            ReaderBookSearchScreen(navController)
+            val viewModel = hiltViewModel<SearchViewModel>()
+            ReaderBookSearchScreen(navController, viewModel)
         }
         composable(route = ReaderScreensEnum.UpdateScreen.name) {
             ReaderUpdateScreen(navController)

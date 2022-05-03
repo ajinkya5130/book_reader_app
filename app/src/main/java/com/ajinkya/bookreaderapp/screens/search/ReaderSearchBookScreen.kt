@@ -2,6 +2,7 @@ package com.ajinkya.bookreaderapp.screens.search
 
 import android.util.Log
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -9,12 +10,11 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.Card
-import androidx.compose.material.Icon
 import androidx.compose.material.Scaffold
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Download
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -22,6 +22,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontFamily
@@ -29,16 +30,21 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import coil.compose.rememberImagePainter
 import com.ajinkya.bookreaderapp.components.InputField
 import com.ajinkya.bookreaderapp.components.ReaderAppBar
-import com.ajinkya.bookreaderapp.model.BookModel
+import com.ajinkya.bookreaderapp.model.Item
 
 private const val TAG = "ReaderSearchBookScreen"
 
 @Preview
 @Composable
-fun ReaderBookSearchScreen(navController: NavHostController = NavHostController(LocalContext.current)) {
+fun ReaderBookSearchScreen(
+    navController: NavHostController = NavHostController(LocalContext.current),
+    viewModel: SearchViewModel = hiltViewModel()
+) {
     Scaffold(topBar = {
         ReaderAppBar(
             title = "Search Book",
@@ -50,7 +56,7 @@ fun ReaderBookSearchScreen(navController: NavHostController = NavHostController(
 //                navController.navigate(ReaderScreensEnum.ReaderHomeScreen.name)
             })
     }) {
-        androidx.compose.material.Surface {
+        Surface {
             Column {
 
                 SearchBook(
@@ -58,9 +64,10 @@ fun ReaderBookSearchScreen(navController: NavHostController = NavHostController(
                         .fillMaxWidth()
                         .padding(10.dp)
                 ) {
+                    viewModel.searchBook(it)
                     Log.e(TAG, "ReaderBookSearchScreen: $it")
                 }
-                BookList(navController)
+                BookList(navController, viewModel)
 
             }
         }
@@ -69,12 +76,15 @@ fun ReaderBookSearchScreen(navController: NavHostController = NavHostController(
 }
 
 @Composable
-fun BookList(navController: NavHostController) {
+fun BookList(navController: NavHostController, viewModel: SearchViewModel = hiltViewModel()) {
+    val list = viewModel.bookLists.value
+    Log.e(TAG, "BookList: $list")
     LazyColumn {
-        items(BookModel().sampleList()) { item ->
-            BookInfo(item)
+        items(list.items!!) { item ->
+            BookInfo(item, navController)
         }
     }
+
 }
 
 
@@ -109,22 +119,45 @@ fun SearchBook(
 }
 
 @Composable
-fun BookInfo(item: BookModel) {
+fun BookInfo(item: Item, navController: NavHostController) {
     Card(
         modifier = Modifier
             .padding(start = 10.dp, end = 10.dp, bottom = 10.dp)
             .fillMaxWidth()
-            .heightIn(min = 100.dp, max = 150.dp)
+            .heightIn(min = 100.dp, max = 170.dp)
             .clickable { },
         shape = RoundedCornerShape(10.dp),
         border = BorderStroke(1.dp, color = Color.DarkGray),
         elevation = 10.dp
     ) {
-
+        var imageURL: String = ""
+        var authors: String = ""
+        var publisher: String = ""
+        var category: String = ""
         Row {
-            Icon(
-                imageVector = Icons.Default.Download, contentDescription = "", modifier =
-                Modifier
+
+
+            try {
+                imageURL = item.volumeInfo.imageLinks.smallThumbnail
+                val sbForAuthors = StringBuilder()
+                val sbForCategory = StringBuilder()
+                item.volumeInfo.authors.forEach { sbForAuthors.append(it).append(",") }
+                authors = sbForAuthors.toString()
+                publisher = item.volumeInfo.publisher
+                item.volumeInfo.categories.forEach { sbForCategory.append(it).append(",") }
+                category = sbForCategory.deleteAt(sbForCategory.length - 1).toString()
+            } catch (e: Exception) {
+                Log.e(TAG, "BookInfo: ${e.message}")
+            }
+
+            val painter =
+                rememberImagePainter(data = imageURL)
+
+            Image(
+                contentScale = ContentScale.FillHeight,
+                painter = painter,
+                contentDescription = "Forest Image",
+                modifier = Modifier
                     .fillMaxHeight()
                     .width(100.dp)
             )
@@ -136,23 +169,26 @@ fun BookInfo(item: BookModel) {
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = "Book name", fontWeight = FontWeight.ExtraBold,
+                    text = "Book name - ${item.volumeInfo.title}",
+                    fontWeight = FontWeight.ExtraBold,
+                    fontFamily = FontFamily.Serif,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Text(
+                    text = "Category - $category", fontWeight = FontWeight.W500,
                     fontFamily = FontFamily.Serif, overflow = TextOverflow.Ellipsis
                 )
                 Text(
-                    text = "Book name", fontWeight = FontWeight.W500,
+                    text = "Authors - $authors", fontWeight = FontWeight.Thin,
                     fontFamily = FontFamily.Serif, overflow = TextOverflow.Ellipsis
                 )
                 Text(
-                    text = "Book name", fontWeight = FontWeight.Thin,
-                    fontFamily = FontFamily.Serif, overflow = TextOverflow.Ellipsis
-                )
-                Text(
-                    text = "Book name", fontWeight = FontWeight.Normal,
+                    text = "Publisher - $publisher", fontWeight = FontWeight.Normal,
                     fontFamily = FontFamily.Serif, overflow = TextOverflow.Ellipsis
                 )
             }
-        }
 
+
+        }
     }
 }

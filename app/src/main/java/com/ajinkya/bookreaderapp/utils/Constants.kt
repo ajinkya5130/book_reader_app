@@ -13,4 +13,8 @@ object Constants {
     const val FIRESTORE_PROFILE_URL = "profileUrl"
     const val FIRESTORE_QUOTE = "quote"
     const val FIRESTORE_PROFESSION = "profession"
+
+    //https://www.googleapis.com/books/v1/volumes?q=android
+    const val BASE_URL = "https://www.googleapis.com/books/v1/"
+
 }
