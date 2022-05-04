@@ -9,10 +9,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.material.Card
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
@@ -78,10 +75,16 @@ fun ReaderBookSearchScreen(
 @Composable
 fun BookList(navController: NavHostController, viewModel: SearchViewModel = hiltViewModel()) {
     val list = viewModel.bookLists.value
-    Log.e(TAG, "BookList: $list")
-    LazyColumn {
-        items(list.items!!) { item ->
-            BookInfo(item, navController)
+    val isLoading = viewModel.isLoading
+    if (isLoading) {
+        LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+    } else {
+
+        Log.e(TAG, "BookList: $list")
+        LazyColumn {
+            items(list.items!!) { item ->
+                BookInfo(item, navController)
+            }
         }
     }
 

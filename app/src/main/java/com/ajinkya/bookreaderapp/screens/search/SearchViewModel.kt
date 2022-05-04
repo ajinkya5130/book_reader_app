@@ -1,7 +1,9 @@
 package com.ajinkya.bookreaderapp.screens.search
 
 import android.util.Log
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ajinkya.bookreaderapp.data.ApiResponse
@@ -16,13 +18,8 @@ private const val TAG = "SearchViewModel"
 @HiltViewModel
 class SearchViewModel @Inject constructor(private val repository: BooksRepoInterface) :
     ViewModel() {
-    var bookLists = mutableStateOf(OnlineBookModel()) /*MutableState<DataOrException<OnlineBookModel, Boolean, Exception>> =
-        mutableStateOf(
-            DataOrException(
-                OnlineBookModel(), false, Exception("")
-            )
-        )*/
-    //val bookLists = _booksList
+    var bookLists = mutableStateOf(OnlineBookModel())
+    var isLoading: Boolean by mutableStateOf(true)
 
     init {
         loadBooks()
@@ -51,13 +48,19 @@ class SearchViewModel @Inject constructor(private val repository: BooksRepoInter
         viewModelScope.launch {
             if (bookName.isEmpty()) return@launch
 
+            isLoading = true
+
             when (val response = repository.getBooksList(bookName = bookName)) {
                 is ApiResponse.Error -> {
+                    isLoading = false
                     Log.e(TAG, "searchBook: ${response.message}")
                 }
-                is ApiResponse.Loading -> {}
+                is ApiResponse.Loading -> {
+
+                }
                 is ApiResponse.Success -> {
                     bookLists.value = response.data!!
+                    isLoading = false
                 }
             }
 
